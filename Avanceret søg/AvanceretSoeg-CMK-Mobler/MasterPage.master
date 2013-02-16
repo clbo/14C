@@ -1,0 +1,40 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>CMK-Møbler</title>
+    <link href="styles/Style.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <header>
+        <section>
+        </section>
+        <nav>Forsiden | Nyheds arkiv | Møbler | Kontakt</nav>
+    </header>
+    <aside>
+        <section>
+            <h1>
+                <asp:Label ID="Label_sidetitel" runat="server" Text="Label"></asp:Label></h1>
+        </section>
+        <section>
+            <h1>
+                Tilmeld nyhedsbrev</h1>
+        </section>
+        <section>
+            <h1>
+                Kontaktoplysninger</h1>
+        </section>
+    </aside>
+    <section>
+        <article>
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </article>
+    </section>
+    </form>
+</body>
+</html>
