@@ -43,10 +43,14 @@ public partial class Soeg_Mobler : System.Web.UI.Page
 
     #region Private Fields (variabler der bruges i sidens metoder)
 
+    // Forbind til databasen
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString());
     private SqlCommand cmd = new SqlCommand();
 
+    // SQL strengen (første del)
     private string sqlText = "SELECT * FROM Mobler WHERE";
+
+    // Tæller der bruges i koden nedenunder til at holde styr på hvor mange gange et for loop har kørt
     private int count = 0;
 
     #endregion
@@ -92,35 +96,40 @@ public partial class Soeg_Mobler : System.Web.UI.Page
         this.cmd.Connection = conn;
 
         //CheckBoxList - Kategorier
-        if (CheckBoxList_kategori.SelectedIndex != -1)
+        // Hvis en eller flere af checkboxene er markeret (sofa, sofabord osv.) vil CheckBoxList_kategori.SelectedIndex 
+        // have en anden værdi end -1. Så hvis noget er afkrydset køres koden inden i if
+        if (CheckBoxList_kategori.SelectedIndex != -1)  
         {
             // For hver checkbox der er afkrydset køres loopet
             for (int i = 0; i < CheckBoxList_kategori.Items.Count; i++)
             {
                 // Checkbokse
+                // Denne kode køres ved den første checkbox som er afkrydset
                 if (CheckBoxList_kategori.Items[i].Selected && this.count == 0)
                 {
                     this.count = this.count + 1;
                     this.cmd.CommandText = sqlText += " (FK_Kategori = @kategori)";
                     cmd.Parameters.Add("@kategori", SqlDbType.Int).Value = CheckBoxList_kategori.Items[i].Value;
 
-                    //DropDownList - Designer
+                    //DropDownList - Designer - kald af DesignerMethod()
                     DesignerMethod();
-                    // Design år
+                    // Design år  - kald af DesignAarMethod()
                     DesignAarMethod();
-                    // Pris
+                    // Pris  - kald af PrisMethod()
                     PrisMethod();
                 }
+                // Denne kode køres ved den 2., 3., 4,. osv checkbox som er afkrydset
                 else if (CheckBoxList_kategori.Items[i].Selected)
                 {
+                    // Det eneste der er anderledes i forhold  til overover er "OR" i sql sætningen
                     this.cmd.CommandText = sqlText += " OR (FK_Kategori = @kategori" + i + ")";
                     cmd.Parameters.Add("@kategori" + i, SqlDbType.Int).Value = CheckBoxList_kategori.Items[i].Value;
 
-                    //DropDownList - Designer
+                    //DropDownList - Designer - kald af DesignerMethod()
                     DesignerMethod();
-                    // Design år
+                    // Design år  - kald af DesignAarMethod()
                     DesignAarMethod();
-                    // Pris
+                    // Pris  - kald af PrisMethod()
                     PrisMethod();
                 }
             }
@@ -138,7 +147,8 @@ public partial class Soeg_Mobler : System.Web.UI.Page
 
         // Default søg, hvis ingen felter er udfyldt
         DefaultMethod();
-
+        
+        // åben forbindelsen til databasen og databind resultatet af søgningen til repeater
         conn.Open();
         Repeater_mobler_soeg_resultat.DataSource = cmd.ExecuteReader();
         Repeater_mobler_soeg_resultat.DataBind();
@@ -152,8 +162,11 @@ public partial class Soeg_Mobler : System.Web.UI.Page
 
     private void DesignerMethod()
     {
+        // hvis intet er valgt i designer dropdown vil SelectedIndex være lig med 0
+        // Så hvis noget er valgt køres koden 
         if (DropDownList_designer.SelectedIndex != 0)
         {
+            // kalder (kører) metoden SqlMethod(), som tilføjer et "AND" til sqlstrengen
             SqlAndMethod();
 
             this.count = this.count + 1;
@@ -165,8 +178,10 @@ public partial class Soeg_Mobler : System.Web.UI.Page
 
     private void DesignAarMethod()
     {
+        // hvis textfelterne i designår min og designår max ikke er tomme køres koden
         if (TextBox_designer_min.Text != "" && TextBox_designer_max.Text != "")
         {
+            // kalder (kører) metoden SqlMethod(), som tilføjer et "AND" til sqlstrengen
             SqlAndMethod();
 
             this.count = this.count + 1;
@@ -179,8 +194,10 @@ public partial class Soeg_Mobler : System.Web.UI.Page
 
     private void PrisMethod()
     {
+        // hvis textfelterne i pris min og pris max ikke er tomme køres koden
         if (TextBox_pris_min.Text != "" && TextBox_pris_max.Text != "")
         {
+            // kalder (kører) metoden SqlMethod(), som tilføjer et "AND" til sqlstrengen
             SqlAndMethod();
 
             this.count = this.count + 1;
@@ -206,7 +223,9 @@ public partial class Soeg_Mobler : System.Web.UI.Page
             && TextBox_designer_min.Text == "" && TextBox_designer_max.Text == ""
             && TextBox_pris_min.Text == "" && TextBox_pris_max.Text == "")
         {
-            this.cmd.CommandText = "SELECT * FROM Mobler";
+            // sql sætninger der med sikkerhed ikke returnerer noget resultat
+            // Altså hvis man ikke har søgt på noget, kommer der ikke noget resultat
+            this.cmd.CommandText = "SELECT * FROM Mobler WHERE M_id = -1";
 
         }
     }
